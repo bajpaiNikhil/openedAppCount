@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">openedAppCount</string>
+    <string name="widget_description">Shows today\'s unlock count</string>
+</resources>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0F0C29"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/label_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="UNLOCKS TODAY"
+        android:textColor="#64748B"
+        android:textSize="9sp"
+        android:letterSpacing="0.1" />
+
+    <TextView
+        android:id="@+id/count_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#38BDF8"
+        android:textSize="44sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/label_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="times unlocked"
+        android:textColor="#475569"
+        android:textSize="9sp" />
+
+    <TextView
+        android:id="@+id/timestamp_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textColor="#334155"
+        android:textSize="8sp" />
+
+</LinearLayout>
