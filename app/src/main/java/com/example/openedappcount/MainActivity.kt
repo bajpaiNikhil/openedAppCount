@@ -39,6 +39,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         wellbeingViewModel.refresh(showLoading = false)
+        wellbeingViewModel.refreshTimeline()
         widgetScope.launch {
             val manager = AppWidgetManager.getInstance(this@MainActivity)
             val ids = manager.getAppWidgetIds(

@@ -1,8 +1,6 @@
 package com.example.openedappcount
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,96 +17,109 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.openedappcount.ui.theme.CyanAccent
-import com.example.openedappcount.ui.theme.IconGradients
-import com.example.openedappcount.ui.theme.IndigoAccent
-import com.example.openedappcount.ui.theme.MutedText
+import com.example.openedappcount.ui.theme.AppAccentColors
+import com.example.openedappcount.ui.theme.SectionDiv
+import com.example.openedappcount.ui.theme.TextDim
+import com.example.openedappcount.ui.theme.TextMid
+import com.example.openedappcount.ui.theme.TextPrimary
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 @Composable
-fun AppUsageRow(app: AppUsageInfo, maxTimeMillis: Long) {
-    val safeMax = maxTimeMillis.coerceAtLeast(1L)
-    val fraction = (app.totalTimeInMillis.toFloat() / safeMax).coerceIn(0f, 1f)
-    val percent = (fraction * 100).roundToInt()
-    val letter = app.appName.firstOrNull()?.uppercaseChar() ?: '?'
-    val (iconStart, iconEnd) = IconGradients[letter.code % IconGradients.size]
-    val rowShape = RoundedCornerShape(10.dp)
+fun AppUsageRow(
+    app: AppUsageInfo,
+    rank: Int,
+    maxTimeMillis: Long,
+    totalTimeMillis: Long
+) {
+    val fraction = (app.totalTimeInMillis.toFloat() / maxTimeMillis.coerceAtLeast(1L)).coerceIn(0f, 1f)
+    val percent = if (totalTimeMillis > 0)
+        ((app.totalTimeInMillis.toFloat() / totalTimeMillis) * 100).roundToInt()
+    else 0
+    val accent = AppAccentColors[abs(app.appName.hashCode()) % AppAccentColors.size]
+    val initials = appInitials(app.appName)
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp)
-            .clip(rowShape)
-            .background(Color.White.copy(alpha = 0.05f))
-            .border(1.dp, Color.White.copy(alpha = 0.07f), rowShape)
-            .padding(horizontal = 12.dp, vertical = 10.dp),
+            .padding(horizontal = 20.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Rank
+        Text(
+            text = "$rank",
+            color = TextDim,
+            fontSize = 11.sp,
+            fontFamily = FontFamily.Monospace,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.width(16.dp)
+        )
+        Spacer(Modifier.width(10.dp))
+        // Icon
         Box(
             modifier = Modifier
-                .size(32.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(Brush.linearGradient(listOf(iconStart, iconEnd))),
+                .size(34.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(accent.copy(alpha = 0.12f)),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = letter.toString(),
-                color = Color.White,
+                text = initials,
+                color = accent,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold
             )
         }
-
         Spacer(Modifier.width(10.dp))
-
+        // Name + time
         Column(modifier = Modifier.weight(1f)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = app.appName,
-                    color = Color.White,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    text = "$percent%",
-                    color = CyanAccent,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            Text(
+                text = app.appName,
+                color = TextPrimary,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
             Text(
                 text = formatDuration(app.totalTimeInMillis),
-                color = MutedText,
-                fontSize = 9.sp
+                color = TextMid,
+                fontSize = 11.sp
             )
-            Spacer(Modifier.height(6.dp))
+        }
+        Spacer(Modifier.width(10.dp))
+        // Progress bar + %
+        Column(
+            modifier = Modifier.width(80.dp),
+            horizontalAlignment = Alignment.End
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(3.dp)
+                    .height(4.dp)
                     .clip(RoundedCornerShape(2.dp))
-                    .background(Color.White.copy(alpha = 0.08f))
+                    .background(SectionDiv)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(fraction)
                         .fillMaxHeight()
-                        .background(Brush.linearGradient(listOf(CyanAccent, IndigoAccent)))
+                        .background(accent)
                 )
             }
+            Text(
+                text = "$percent%",
+                color = accent,
+                fontSize = 12.sp,
+                fontFamily = FontFamily.Monospace,
+                modifier = Modifier.padding(top = 3.dp)
+            )
         }
     }
 }
@@ -121,5 +132,16 @@ fun formatDuration(millis: Long): String {
         hours > 0 -> "${hours}h ${minutes % 60}m"
         minutes > 0 -> "${minutes}m"
         else -> "${seconds}s"
+    }
+}
+
+private fun appInitials(name: String): String {
+    val words = name.trim().split(Regex("\\s+"))
+    return if (words.size >= 2) {
+        "${words[0].first().uppercaseChar()}${words[1].first().lowercaseChar()}"
+    } else if (name.length >= 2) {
+        "${name[0].uppercaseChar()}${name[1].lowercaseChar()}"
+    } else {
+        name.uppercase()
     }
 }
