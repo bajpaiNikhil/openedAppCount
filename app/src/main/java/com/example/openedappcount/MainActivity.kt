@@ -40,6 +40,7 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         wellbeingViewModel.refresh(showLoading = false)
         wellbeingViewModel.refreshTimeline()
+        wellbeingViewModel.refreshMonthly()
         widgetScope.launch {
             val manager = AppWidgetManager.getInstance(this@MainActivity)
             val ids = manager.getAppWidgetIds(

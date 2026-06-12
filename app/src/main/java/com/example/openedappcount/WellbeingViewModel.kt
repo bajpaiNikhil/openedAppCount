@@ -76,9 +76,40 @@ class WellbeingViewModel(application: Application) : AndroidViewModel(applicatio
     var isLoadingExtended by mutableStateOf(false)
         private set
 
+    // ── Monthly calendar data ─────────────────────────────────────────────
+    var monthlyDayStats by mutableStateOf<List<DayStats?>>(emptyList())
+        private set
+    var selectedDay by mutableStateOf<Int?>(null) // null = today, 1-31 for a specific day
+    var isLoadingMonthly by mutableStateOf(false)
+        private set
+
+    val selectedDayStats: DayStats?
+        get() {
+            val day = selectedDay ?: java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_MONTH)
+            return monthlyDayStats.getOrNull(day - 1)
+        }
+
+    val avgUnlockCount: Int?
+        get() {
+            val filled = monthlyDayStats.filterNotNull().filter { it.unlockCount > 0 }
+            return if (filled.isEmpty()) null else filled.sumOf { it.unlockCount } / filled.size
+        }
+
     init {
         refresh(showLoading = true)
         refreshExtended()
+        refreshMonthly()
+    }
+
+    fun refreshMonthly() {
+        viewModelScope.launch(Dispatchers.IO) {
+            withContext(Dispatchers.Main) { isLoadingMonthly = true }
+            val stats = try { repository.getMonthlyStats() } catch (e: Exception) { emptyList() }
+            withContext(Dispatchers.Main) {
+                monthlyDayStats = stats
+                isLoadingMonthly = false
+            }
+        }
     }
 
     fun refresh(showLoading: Boolean = false) {

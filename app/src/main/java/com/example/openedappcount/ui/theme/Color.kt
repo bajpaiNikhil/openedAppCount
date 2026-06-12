@@ -17,7 +17,8 @@ val CardBorder    = Color(0xFF1A1F38)   // card border
 val SectionDiv    = Color(0xFF0F1221)   // row dividers
 
 val BlueAccent    = Color(0xFF3D7FFF)   // primary accent (unlocks, tabs, timeline peak)
-val PurpleAccent  = Color(0xFFA78BFA)   // secondary accent (screen time)
+val PurpleAccent  = Color(0xFFA78BFA)   // secondary accent
+val OrangeAccent  = Color(0xFFF97316)   // screen time highlight
 val GreenAccent   = Color(0xFF34D399)   // streak success
 
 val TextHeading   = Color(0xFFE8EAF2)   // "Screen Habits" title
@@ -48,6 +49,14 @@ val AppAccentColors = listOf(
     Color(0xFFF59E0B), // amber
     Color(0xFFEC4899), // pink
 )
+
+// ── Minimal home screen palette ──────────────────────────────────────────
+val MinBg     = Color(0xFFFFFFFF)
+val MinInk    = Color(0xFF111111)
+val MinMuted  = Color(0xFF9A9A9A)
+val MinFaint  = Color(0xFFECECEC)
+val MinAccent = Color(0xFFFF5A1F)
+val MinLine   = Color(0xFFEFEFEF)
 
 // Legacy — kept for any references in the widget / older code
 val CyanAccent   = Color(0xFF38BDF8)

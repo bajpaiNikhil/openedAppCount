@@ -5,6 +5,12 @@
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <!-- Required to call getLaunchIntentForPackage() on Android 11+ without being
+         silently blocked by AppsFilter for apps not in <queries>. Without this,
+         every major user app (WhatsApp, YouTube, Chrome, etc.) returns null and
+         gets incorrectly treated as a system app, dropping its screen time. -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
 
     <application
         android:allowBackup="true"
