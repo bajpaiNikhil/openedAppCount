@@ -76,6 +76,19 @@ class WellbeingViewModel(application: Application) : AndroidViewModel(applicatio
     var isLoadingExtended by mutableStateOf(false)
         private set
 
+    // ── Check patterns (compulsion lens) ──────────────────────────────────────
+    var checkStats by mutableStateOf<List<AppCheckStat>>(emptyList())
+        private set
+
+    val reflexChecks: Int
+        get() = checkStats.filter { it.isReflex }.sumOf { it.opens }
+
+    val reflexAppCount: Int
+        get() = checkStats.count { it.isReflex }
+
+    val mostDeliberate: AppCheckStat?
+        get() = checkStats.filter { it.opens >= 2 }.maxByOrNull { it.avgSessionMillis }
+
     // ── Monthly calendar data ─────────────────────────────────────────────
     var monthlyDayStats by mutableStateOf<List<DayStats?>>(emptyList())
         private set
@@ -159,6 +172,7 @@ class WellbeingViewModel(application: Application) : AndroidViewModel(applicatio
 
                 val sessions = repository.getSessionsToday()
                 val streakList = buildStreaks()
+                val checks = repository.getCheckPatterns(todayMidnight, now)
 
                 withContext(Dispatchers.Main) {
                     unlockTimeline = timeline
@@ -170,6 +184,7 @@ class WellbeingViewModel(application: Application) : AndroidViewModel(applicatio
                     leaderboardAvg = avgOpenList
                     sessionSummary = sessions
                     streaks = streakList
+                    checkStats = checks
                     isLoadingExtended = false
                 }
             } catch (e: Exception) {

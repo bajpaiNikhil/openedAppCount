@@ -9,6 +9,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -76,8 +78,9 @@ fun WellbeingScreen(vm: WellbeingViewModel = viewModel()) {
                 .fillMaxSize()
                 .statusBarsPadding()
                 .padding(horizontal = 30.dp)
+                .verticalScroll(rememberScrollState())
         ) {
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.height(40.dp))
             Greeting()
             Spacer(Modifier.height(4.dp))
             DateLine()
@@ -109,7 +112,7 @@ fun WellbeingScreen(vm: WellbeingViewModel = viewModel()) {
                 modifier = Modifier.padding(top = 16.dp),
             )
 
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.height(28.dp))
 
             CalendarSection(
                 daysInMonth  = daysInMonth,
@@ -130,6 +133,13 @@ fun WellbeingScreen(vm: WellbeingViewModel = viewModel()) {
                 color = MinMuted,
             )
             Spacer(Modifier.height(30.dp))
+
+            CheckPatternSection(
+                checkStats = vm.checkStats,
+                reflexChecks = vm.reflexChecks,
+                reflexAppCount = vm.reflexAppCount,
+                mostDeliberate = vm.mostDeliberate,
+            )
         }
 
         val selDay = vm.selectedDay

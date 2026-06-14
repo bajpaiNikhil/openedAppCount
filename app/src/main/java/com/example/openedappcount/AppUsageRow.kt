@@ -135,6 +135,22 @@ fun formatDuration(millis: Long): String {
     }
 }
 
+/**
+ * Compact average-session formatter for the "Checked, not used" section.
+ * Unlike [formatDuration], keeps leftover seconds for sub-10-minute durations
+ * (e.g. "1m 50s") since these averages are usually small.
+ */
+fun shortAvg(millis: Long): String {
+    val totalSeconds = millis / 1000
+    val minutes = totalSeconds / 60
+    val seconds = totalSeconds % 60
+    return when {
+        minutes == 0L -> "${seconds}s"
+        seconds == 0L -> "${minutes}m"
+        else -> "${minutes}m ${seconds}s"
+    }
+}
+
 private fun appInitials(name: String): String {
     val words = name.trim().split(Regex("\\s+"))
     return if (words.size >= 2) {

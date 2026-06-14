@@ -243,6 +243,14 @@ class UsageStatsRepository(
         return result
     }
 
+    // ── Check patterns (compulsion lens) ──────────────────────────────────────
+
+    fun getCheckPatterns(startMs: Long, endMs: Long): List<AppCheckStat> {
+        val opens = getAppOpenCounts(startMs, endMs)
+        val usage = getAppUsageInRange(startMs, endMs)
+        return computeCheckPatterns(opens, usage, MIN_OPENS, SHORT_SESSION_MS)
+    }
+
     // ── Session summary ───────────────────────────────────────────────────────
 
     fun getSessionsToday(): SessionSummary {
@@ -498,5 +506,11 @@ class UsageStatsRepository(
 
     companion object {
         private const val TAG = "AppUsage"
+
+        // Tunables for the "Checked, not used" compulsion lens.
+        // MIN_OPENS: minimum opens before a pattern is even considered for the reflex label.
+        // SHORT_SESSION_MS: an average session below this reads as a glance, not real use.
+        const val MIN_OPENS = 4
+        const val SHORT_SESSION_MS = 30_000L
     }
 }

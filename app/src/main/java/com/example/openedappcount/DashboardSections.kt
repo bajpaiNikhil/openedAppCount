@@ -27,13 +27,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.openedappcount.ui.theme.AppAccentColors
+import com.example.openedappcount.ui.theme.Archivo
 import com.example.openedappcount.ui.theme.BarEmpty
 import com.example.openedappcount.ui.theme.BarHigh
 import com.example.openedappcount.ui.theme.BarMid
@@ -42,6 +46,12 @@ import com.example.openedappcount.ui.theme.BlueAccent
 import com.example.openedappcount.ui.theme.CardBg
 import com.example.openedappcount.ui.theme.CardBorder
 import com.example.openedappcount.ui.theme.GreenAccent
+import com.example.openedappcount.ui.theme.JetBrainsMono
+import com.example.openedappcount.ui.theme.MinAccent
+import com.example.openedappcount.ui.theme.MinFaint
+import com.example.openedappcount.ui.theme.MinInk
+import com.example.openedappcount.ui.theme.MinLine
+import com.example.openedappcount.ui.theme.MinMuted
 import com.example.openedappcount.ui.theme.PurpleAccent
 import com.example.openedappcount.ui.theme.SectionDiv
 import com.example.openedappcount.ui.theme.TextDim
@@ -458,6 +468,137 @@ private fun StreakCard(streak: StreakInfo) {
                 color = TextDim,
                 fontSize = 10.sp,
                 textAlign = TextAlign.End
+            )
+        }
+    }
+}
+
+// ─── Checked, Not Used (compulsion lens) ───────────────────────────────────────
+
+@Composable
+fun CheckPatternSection(
+    checkStats: List<AppCheckStat>,
+    reflexChecks: Int,
+    reflexAppCount: Int,
+    mostDeliberate: AppCheckStat?,
+) {
+    val reflexApps = checkStats.filter { it.isReflex }.take(5)
+    val maxOpens = reflexApps.maxOfOrNull { it.opens } ?: 1
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .padding(bottom = 24.dp)
+    ) {
+        Text(
+            text = "CHECKED, NOT USED",
+            color = MinMuted,
+            fontFamily = Archivo,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            letterSpacing = 2.sp,
+        )
+
+        Spacer(Modifier.height(10.dp))
+
+        if (reflexChecks == 0) {
+            Text(
+                text = "Nothing compulsive today.",
+                color = MinMuted,
+                fontFamily = JetBrainsMono,
+                fontSize = 14.sp,
+            )
+        } else {
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(SpanStyle(color = MinAccent, fontWeight = FontWeight.Bold)) {
+                        append("$reflexChecks reflex checks")
+                    }
+                    withStyle(SpanStyle(color = MinMuted)) {
+                        append(" · $reflexAppCount ${if (reflexAppCount == 1) "app" else "apps"}")
+                    }
+                },
+                fontFamily = JetBrainsMono,
+                fontSize = 16.sp,
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                reflexApps.forEach { app ->
+                    CheckPatternRow(app = app, maxOpens = maxOpens)
+                }
+            }
+        }
+
+        if (mostDeliberate != null) {
+            Spacer(Modifier.height(16.dp))
+            HorizontalDivider(color = MinLine, thickness = 1.dp)
+            Spacer(Modifier.height(12.dp))
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(SpanStyle(color = MinMuted)) { append("Most deliberate · ") }
+                    withStyle(SpanStyle(color = MinInk, fontWeight = FontWeight.SemiBold)) {
+                        append(mostDeliberate.appName)
+                    }
+                    withStyle(SpanStyle(color = MinMuted)) {
+                        append(" ~${formatDuration(mostDeliberate.avgSessionMillis)} avg")
+                    }
+                },
+                fontFamily = JetBrainsMono,
+                fontSize = 12.sp,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CheckPatternRow(app: AppCheckStat, maxOpens: Int) {
+    val accent = AppAccentColors[abs(app.appName.hashCode()) % AppAccentColors.size]
+    val fraction = (app.opens.toFloat() / maxOpens.coerceAtLeast(1)).coerceIn(0f, 1f)
+
+    Column {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .background(accent)
+            )
+            Spacer(Modifier.width(10.dp))
+            Text(
+                text = app.appName,
+                color = MinInk,
+                fontFamily = Archivo,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = "${app.opens}× · ${shortAvg(app.avgSessionMillis)}",
+                color = MinMuted,
+                fontFamily = JetBrainsMono,
+                fontSize = 12.sp,
+            )
+        }
+        Spacer(Modifier.height(6.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(2.dp)
+                .clip(RoundedCornerShape(1.dp))
+                .background(MinFaint)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(fraction)
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(1.dp))
+                    .background(MinAccent)
             )
         }
     }
